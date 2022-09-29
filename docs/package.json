@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@reach/skip-nav": "^0.16.0",
+    "@reach/skip-nav": "^0.17.0",
     "degen": "^0.0.49",
     "ethers": "^5.7.0",
     "fathom-client": "^3.5.0",
