@@ -1,9 +1,9 @@
-import { Abi, Address, ExtractAbiFunction } from 'abitype'
-import { PopulatedTransaction } from 'ethers'
+import type { Abi, Address, ExtractAbiFunction } from 'abitype'
+import type { PopulatedTransaction } from 'ethers'
 
 import { ConnectorNotFoundError } from '../../errors'
-import { Signer } from '../../types'
-import {
+import type { Signer } from '../../types'
+import type {
   DefaultOptions,
   GetConfig,
   GetOverridesForAbiStateMutability,
@@ -11,7 +11,8 @@ import {
 } from '../../types/contracts'
 import { assertActiveChain } from '../../utils'
 import { fetchSigner } from '../accounts'
-import { SendTransactionResult, sendTransaction } from '../transactions'
+import type { SendTransactionResult } from '../transactions'
+import { sendTransaction } from '../transactions'
 import { prepareWriteContract } from './prepareWriteContract'
 
 type Options = Options_ & { isRequestOptional?: boolean }
@@ -25,7 +26,7 @@ export type WriteContractPreparedArgs<
 > = {
   /**
    * `recklesslyUnprepared`: Allow to pass through unprepared config. Note: This has
-   * [UX pitfalls](https://wagmi.sh/docs/prepare-hooks/intro#ux-pitfalls-without-prepare-hooks),
+   * [UX pitfalls](https://wagmi.sh/react/prepare-hooks/intro#ux-pitfalls-without-prepare-hooks),
    * it is highly recommended to not use this and instead prepare the request upfront
    * using the {@link prepareWriteContract} function.
    *
@@ -97,7 +98,7 @@ export type WriteContractResult = SendTransactionResult
  * @description Function to call a contract write method.
  *
  * It is recommended to pair this with the {@link prepareWriteContract} function
- * to avoid [UX pitfalls](https://wagmi.sh/docs/prepare-hooks/intro#ux-pitfalls-without-prepare-hooks).
+ * to avoid [UX pitfalls](https://wagmi.sh/react/prepare-hooks/intro#ux-pitfalls-without-prepare-hooks).
  *
  * @example
  * import { prepareWriteContract, writeContract } from '@wagmi/core'
@@ -126,12 +127,12 @@ export async function writeContract<
   /****************************************************************************/
   /** START: iOS App Link cautious code.                                      */
   /** Do not perform any async operations in this block.                      */
-  /** Ref: https://wagmi.sh/docs/prepare-hooks/intro#ios-app-link-constraints */
+  /** Ref: https://wagmi.sh/react/prepare-hooks/intro#ios-app-link-constraints */
   /****************************************************************************/
 
   const signer = await fetchSigner<TSigner>()
   if (!signer) throw new ConnectorNotFoundError()
-  if (chainId) assertActiveChain({ chainId })
+  if (chainId) assertActiveChain({ chainId, signer })
   if (mode === 'prepared')
     if (!request_) throw new Error('`request` is required')
 

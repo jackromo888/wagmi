@@ -1,19 +1,18 @@
-import {
-  ReadContractsConfig,
-  ReadContractsResult,
-  deepEqual,
-  readContracts,
-} from '@wagmi/core'
-import { ContractsConfig } from '@wagmi/core/internal'
-import { Abi } from 'abitype'
+import { replaceEqualDeep } from '@tanstack/react-query'
+import type { ReadContractsConfig, ReadContractsResult } from '@wagmi/core'
+import { deepEqual, readContracts } from '@wagmi/core'
+import type { ContractsConfig } from '@wagmi/core/internal'
+import type { Abi } from 'abitype'
 import * as React from 'react'
 
-import { InfiniteQueryConfig, QueryFunctionArgs } from '../../types'
-import { UseInfiniteQueryResult, useInfiniteQuery } from '../utils'
+import type { InfiniteQueryConfig, QueryFunctionArgs } from '../../types'
+import type { UseInfiniteQueryResult } from '../utils'
+import { useInfiniteQuery } from '../utils'
 
 export type UseContractInfiniteReadsConfig<
   TContracts extends unknown[] = unknown[],
   TPageParam = unknown,
+  TSelectData = ReadContractsResult<TContracts>,
 > = Pick<ReadContractsConfig<TContracts>, 'allowFailure' | 'overrides'> & {
   cacheKey: string
   contracts(pageParam: TPageParam): readonly [
@@ -25,23 +24,28 @@ export type UseContractInfiniteReadsConfig<
       }
     >,
   ]
-} & InfiniteQueryConfig<ReadContractsResult<TContracts>, Error>
+} & InfiniteQueryConfig<ReadContractsResult<TContracts>, Error, TSelectData>
+
+type QueryKeyArgs = {
+  allowFailure: UseContractInfiniteReadsConfig['allowFailure']
+  cacheKey: UseContractInfiniteReadsConfig['cacheKey']
+  overrides: UseContractInfiniteReadsConfig['overrides']
+}
+type QueryKeyConfig = Pick<UseContractInfiniteReadsConfig, 'scopeKey'>
 
 function queryKey({
   allowFailure,
   cacheKey,
   overrides,
-}: {
-  allowFailure: UseContractInfiniteReadsConfig['allowFailure']
-  cacheKey: UseContractInfiniteReadsConfig['cacheKey']
-  overrides: UseContractInfiniteReadsConfig['overrides']
-}) {
+  scopeKey,
+}: QueryKeyArgs & QueryKeyConfig) {
   return [
     {
       entity: 'readContractsInfinite',
       allowFailure,
       cacheKey,
       overrides,
+      scopeKey,
     },
   ] as const
 }
@@ -79,6 +83,7 @@ export function useContractInfiniteReads<
     functionName: TFunctionName
   }[],
   TPageParam = any,
+  TSelectData = ReadContractsResult<TContracts>,
 >({
   allowFailure,
   cacheKey,
@@ -86,23 +91,29 @@ export function useContractInfiniteReads<
   contracts,
   enabled: enabled_ = true,
   getNextPageParam,
-  isDataEqual = deepEqual,
+  isDataEqual,
   keepPreviousData,
   onError,
   onSettled,
   onSuccess,
   overrides,
+  scopeKey,
   select,
   staleTime,
+  structuralSharing = (oldData, newData) =>
+    deepEqual(oldData, newData)
+      ? oldData
+      : (replaceEqualDeep(oldData, newData) as any),
   suspense,
 }: UseContractInfiniteReadsConfig<
   TContracts,
-  TPageParam
+  TPageParam,
+  TSelectData
 >): // Need explicit type annotation so TypeScript doesn't expand return type into recursive conditional
-UseInfiniteQueryResult<ReadContractsResult<TContracts>, Error> {
+UseInfiniteQueryResult<TSelectData, Error> {
   const queryKey_ = React.useMemo(
-    () => queryKey({ allowFailure, cacheKey, overrides }),
-    [allowFailure, cacheKey, overrides],
+    () => queryKey({ allowFailure, cacheKey, overrides, scopeKey }),
+    [allowFailure, cacheKey, overrides, scopeKey],
   )
 
   const enabled = React.useMemo(() => {
@@ -118,6 +129,7 @@ UseInfiniteQueryResult<ReadContractsResult<TContracts>, Error> {
     keepPreviousData,
     select,
     staleTime,
+    structuralSharing,
     suspense,
     onError,
     onSettled,
@@ -133,6 +145,7 @@ export function paginatedIndexesConfig<
     abi: TAbi
     functionName: TFunctionName
   }[],
+  TSelectData = ReadContractsResult<TContracts>,
 >(
   fn: UseContractInfiniteReadsConfig<TContracts>['contracts'],
   {
@@ -143,7 +156,11 @@ export function paginatedIndexesConfig<
 ): // Need explicit type annotation so TypeScript doesn't expand return type into recursive conditional
 {
   contracts: UseContractInfiniteReadsConfig<TContracts>['contracts']
-  getNextPageParam: InfiniteQueryConfig<unknown[], Error>['getNextPageParam']
+  getNextPageParam: InfiniteQueryConfig<
+    unknown[],
+    Error,
+    TSelectData
+  >['getNextPageParam']
 } {
   const contracts = ((page = 0) =>
     [...Array(perPage).keys()]

@@ -1,21 +1,16 @@
 import { act } from '@testing-library/react'
 
-import {
-  Connector,
-  Provider,
-  WebSocketProvider,
-  defaultChains,
-} from '@wagmi/core'
+import type { Connector, Provider, WebSocketProvider } from '@wagmi/core'
 import { MockConnector } from '@wagmi/core/connectors/mock'
 import { expect } from 'vitest'
 
-import { renderHook } from '.'
+import type { renderHook } from '.'
 import { getProvider, getSigners } from '../../core/test/utils'
-import { CreateClientConfig, createClient } from '../src'
-import {
-  UseAccountConfig,
-  useAccount as useAccount_,
-} from '../src/hooks/accounts/useAccount'
+import type { CreateClientConfig } from '../src'
+import { createClient } from '../src'
+import { goerli, mainnet } from '../src/chains'
+import type { UseAccountConfig } from '../src/hooks/accounts/useAccount'
+import { useAccount as useAccount_ } from '../src/hooks/accounts/useAccount'
 import { useNetwork as useNetwork_ } from '../src/hooks/accounts/useNetwork'
 
 type Config = Partial<CreateClientConfig>
@@ -29,7 +24,8 @@ export function setupClient(config: Config = {}) {
         },
       }),
     ],
-    provider: ({ chainId }) => getProvider({ chainId, chains: defaultChains }),
+    provider: ({ chainId }) =>
+      getProvider({ chainId, chains: [mainnet, goerli] }),
     ...config,
   })
 }

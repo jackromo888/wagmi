@@ -1,12 +1,9 @@
-import {
-  WriteContractArgs,
-  WriteContractResult,
-  writeContract,
-} from '@wagmi/core'
-import { Abi } from 'abitype'
+import type { WriteContractArgs, WriteContractResult } from '@wagmi/core'
+import { writeContract } from '@wagmi/core'
+import type { Abi } from 'abitype'
 import * as React from 'react'
 
-import { MutationConfig } from '../../types'
+import type { MutationConfig } from '../../types'
 import { useMutation } from '../utils'
 
 export type UseContractWriteArgs<
@@ -39,7 +36,7 @@ type UseContractWriteMutationArgs<
   : {
       /**
        * Recklessly pass through unprepared config. Note: This has
-       * [UX pitfalls](https://wagmi.sh/docs/prepare-hooks/intro#ux-pitfalls-without-prepare-hooks),
+       * [UX pitfalls](https://wagmi.sh/react/prepare-hooks/intro#ux-pitfalls-without-prepare-hooks),
        * it is highly recommended to not use this and instead prepare the config upfront
        * using the `usePrepareContractWrite` function.
        */
@@ -130,7 +127,7 @@ function mutationFn({
  * method.
  *
  * It is highly recommended to pair this with the [`usePrepareContractWrite` hook](/docs/prepare-hooks/usePrepareContractWrite)
- * to [avoid UX pitfalls](https://wagmi.sh/docs/prepare-hooks/intro#ux-pitfalls-without-prepare-hooks).
+ * to [avoid UX pitfalls](https://wagmi.sh/react/prepare-hooks/intro#ux-pitfalls-without-prepare-hooks).
  *
  * @example
  * import { useContractWrite, usePrepareContractWrite } from 'wagmi'
@@ -184,7 +181,7 @@ export function useContractWrite<
       mode,
       overrides,
       request,
-    } as WriteContractArgs),
+    } as UseContractWriteArgs),
     mutationFn,
     {
       onError,
@@ -212,7 +209,7 @@ export function useContractWrite<
         overrides:
           overrideConfig?.recklesslySetUnpreparedOverrides ?? overrides,
         request,
-      } as WriteContractArgs)
+      } as UseContractWriteArgs)
     },
     [
       address,
@@ -245,7 +242,7 @@ export function useContractWrite<
         overrides:
           overrideConfig?.recklesslySetUnpreparedOverrides ?? overrides,
         request,
-      } as WriteContractArgs)
+      } as UseContractWriteArgs)
     },
     [
       address,

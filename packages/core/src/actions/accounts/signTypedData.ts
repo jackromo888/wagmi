@@ -1,12 +1,13 @@
-import {
+import type {
   Narrow,
   TypedData,
   TypedDataDomain,
   TypedDataToPrimitiveTypes,
 } from 'abitype'
-import { TypedDataField, providers } from 'ethers'
+import type { TypedDataField, providers } from 'ethers'
 
-import { ConnectorNotFoundError } from '../../errors'
+import type { EthersError, ProviderRpcError } from '../../errors'
+import { ConnectorNotFoundError, UserRejectedRequestError } from '../../errors'
 import { assertActiveChain, normalizeChainId } from '../../utils'
 import { fetchSigner } from './fetchSigner'
 
@@ -48,12 +49,24 @@ export async function signTypedData<TTypedData extends TypedData>({
 
   const { chainId: chainId_ } = domain
   const chainId = chainId_ ? normalizeChainId(chainId_) : undefined
-  if (chainId) assertActiveChain({ chainId })
+  if (chainId) assertActiveChain({ chainId, signer })
 
-  // Method name may be changed in the future, see https://docs.ethers.io/v5/api/signer/#Signer-signTypedData
-  return signer._signTypedData(
-    domain,
-    types as unknown as Record<string, TypedDataField[]>,
-    value,
-  )
+  const types_ = Object.entries(types)
+    .filter(([key]) => key !== 'EIP712Domain')
+    .reduce((types, [key, attributes]: [string, TypedDataField[]]) => {
+      types[key] = attributes.filter((attr) => attr.type !== 'EIP712Domain')
+      return types
+    }, {} as Record<string, TypedDataField[]>)
+
+  try {
+    // Method name may be changed in the future, see https://docs.ethers.io/v5/api/signer/#Signer-signTypedData
+    return await signer._signTypedData(domain, types_, value)
+  } catch (error) {
+    if (
+      (error as ProviderRpcError).code === 4001 ||
+      (error as EthersError).code === 'ACTION_REJECTED'
+    )
+      throw new UserRejectedRequestError(error)
+    throw error
+  }
 }

@@ -1,13 +1,12 @@
-import { Abi } from 'abitype'
+import type { Abi } from 'abitype'
 
-import { mainnet } from '../../chains'
 import {
   ChainDoesNotSupportMulticallError,
   ContractMethodNoResultError,
   ContractMethodRevertedError,
   ContractResultDecodeError,
 } from '../../errors'
-import {
+import type {
   ContractsConfig,
   ContractsResult,
   DefaultOptions,
@@ -95,9 +94,9 @@ export async function readContracts<
         }),
       )
 
-    let results
+    let multicallResults
     if (allowFailure) {
-      results = (await Promise.allSettled(promises()))
+      multicallResults = (await Promise.allSettled(promises()))
         .map((result) => {
           if (result.status === 'fulfilled') return result.value
           if (result.reason instanceof ChainDoesNotSupportMulticallError) {
@@ -108,7 +107,7 @@ export async function readContracts<
         })
         .flat()
     } else {
-      results = (await Promise.all(promises())).flat()
+      multicallResults = (await Promise.all(promises())).flat()
     }
 
     // Reorder the contract results back to the order they were
@@ -116,8 +115,11 @@ export async function readContracts<
     const resultIndexes = Object.values(contractsByChainId)
       .map((contracts) => contracts.map(({ index }) => index))
       .flat()
-    return results.reduce((results, result, index) => {
-      results[resultIndexes[index]!] = result
+    return multicallResults.reduce((results, result, index) => {
+      if (results)
+        (results as Record<string | number, unknown> & readonly unknown[])[
+          resultIndexes[index]!
+        ] = result
       return results
     }, [] as unknown[]) as ReadContractsResult<TContracts>
   } catch (err) {
@@ -136,7 +138,7 @@ export async function readContracts<
         const error = new ContractMethodRevertedError({
           address,
           functionName,
-          chainId: chainId ?? mainnet.id,
+          chainId: chainId ?? 1,
           args,
           errorMessage: result.reason,
         })

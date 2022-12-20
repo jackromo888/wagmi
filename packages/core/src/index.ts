@@ -110,30 +110,19 @@ export type {
   WriteContractUnpreparedArgs,
 } from './actions'
 
-export { createClient, Client } from './client'
+export { mainnet, goerli } from './chains'
+export type { Chain } from './chains'
+
+export { createClient, getClient, Client } from './client'
 export type { ClientConfig } from './client'
 
-export { Connector, InjectedConnector } from './connectors'
-export type {
-  ConnectorData,
-  ConnectorEvents,
-  InjectedConnectorOptions,
-} from './connectors'
+export { Connector } from './connectors'
+export type { ConnectorData, ConnectorEvents } from './connectors'
 
-export {
-  alchemyRpcUrls,
-  allChains,
-  chain,
-  chainId,
-  defaultChains,
-  defaultL2Chains,
-  erc20ABI,
-  erc721ABI,
-  etherscanBlockExplorers,
-  infuraRpcUrls,
-  publicRpcUrls,
-  units,
-} from './constants'
+export { InjectedConnector } from './connectors/injected'
+export type { InjectedConnectorOptions } from './connectors/injected'
+
+export { erc20ABI, erc721ABI, erc4626ABI, units } from './constants'
 
 export {
   AddChainError,
@@ -159,7 +148,6 @@ export { createStorage, noopStorage } from './storage'
 export type { ClientStorage as Storage } from './storage'
 
 export type {
-  Chain,
   ChainProviderFn,
   Ethereum,
   FallbackProviderConfig,
@@ -175,8 +163,10 @@ export type { Address } from 'abitype'
 export {
   configureChains,
   deepEqual,
+  deserialize,
   minimizeContractInterface,
   normalizeChainId,
   parseContractResult,
+  serialize,
 } from './utils'
 export type { ConfigureChainsConfig } from './utils'

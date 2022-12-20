@@ -1,9 +1,12 @@
 import { persist, subscribeWithSelector } from 'zustand/middleware'
-import { Mutate, StoreApi, default as create } from 'zustand/vanilla'
+import type { Mutate, StoreApi } from 'zustand/vanilla'
+import { default as create } from 'zustand/vanilla'
 
-import { Connector, ConnectorData, InjectedConnector } from './connectors'
-import { ClientStorage, createStorage, noopStorage } from './storage'
-import { Provider, WebSocketProvider } from './types'
+import type { Connector, ConnectorData } from './connectors'
+import { InjectedConnector } from './connectors'
+import type { ClientStorage } from './storage'
+import { createStorage, noopStorage } from './storage'
+import type { Provider, WebSocketProvider } from './types'
 
 export type ClientConfig<
   TProvider extends Provider = Provider,
@@ -96,9 +99,10 @@ export class Client<
     let chainId: number | undefined
     if (autoConnect) {
       try {
-        const rawState = storage.getItem(storeKey, '')
-        const data: Data<TProvider> | undefined = JSON.parse(rawState || '{}')
-          ?.state?.data
+        const rawState = storage.getItem<{
+          state: State<TProvider, TWebSocketProvider>
+        }>(storeKey)
+        const data: Data<TProvider> | undefined = rawState?.state?.data
         // If account exists in localStorage, set status to reconnecting
         status = data?.account ? 'reconnecting' : 'connecting'
         chainId = data?.chain?.id
@@ -117,6 +121,7 @@ export class Client<
       subscribeWithSelector(
         persist(
           () =>
+            // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
             <State<TProvider, TWebSocketProvider>>{
               connectors:
                 typeof connectors === 'function' ? connectors() : connectors,
@@ -125,6 +130,11 @@ export class Client<
               webSocketProvider: this.getWebSocketProvider({ chainId }),
             },
           {
+            // Deserialization is handled in `storage`.
+            deserialize: (state) =>
+              state as unknown as {
+                state: Partial<State<TProvider, TWebSocketProvider>>
+              },
             name: storeKey,
             getStorage: () => storage,
             partialize: (state) => ({
@@ -136,7 +146,9 @@ export class Client<
               }),
               chains: state?.chains,
             }),
-            version: 1,
+            // Serialization is handled in `storage`.
+            serialize: (state) => state as unknown as string,
+            version: 2,
           },
         ),
       ),
@@ -358,7 +370,7 @@ export function getClient<
 >() {
   if (!client) {
     throw new Error(
-      'No wagmi client found. Ensure you have set up a client: https://wagmi.sh/docs/client',
+      'No wagmi client found. Ensure you have set up a client: https://wagmi.sh/react/client',
     )
   }
   return client as unknown as Client<TProvider, TWebSocketProvider>

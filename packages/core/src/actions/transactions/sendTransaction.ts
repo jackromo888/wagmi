@@ -1,12 +1,9 @@
-import { Address } from 'abitype'
-import { providers } from 'ethers'
+import type { Address } from 'abitype'
+import type { providers } from 'ethers'
 
-import {
-  ConnectorNotFoundError,
-  ProviderRpcError,
-  UserRejectedRequestError,
-} from '../../errors'
-import { Hash, Signer } from '../../types'
+import type { EthersError, ProviderRpcError } from '../../errors'
+import { ConnectorNotFoundError, UserRejectedRequestError } from '../../errors'
+import type { Hash, Signer } from '../../types'
 import { assertActiveChain } from '../../utils'
 import { fetchSigner } from '../accounts'
 
@@ -46,7 +43,7 @@ export type SendTransactionResult = {
  * @description Function to send a transaction.
  *
  * It is recommended to pair this with the `prepareSendTransaction` function to avoid
- * [UX pitfalls](https://wagmi.sh/docs/prepare-hooks/intro#ux-pitfalls-without-prepare-hooks).
+ * [UX pitfalls](https://wagmi.sh/react/prepare-hooks/intro#ux-pitfalls-without-prepare-hooks).
  *
  * @example
  * import { prepareSendTransaction, sendTransaction } from '@wagmi/core'
@@ -65,7 +62,7 @@ export async function sendTransaction({
   /********************************************************************/
   /** START: iOS App Link cautious code.                              */
   /** Do not perform any async operations in this block.              */
-  /** Ref: wagmi.sh/docs/prepare-hooks/intro#ios-app-link-constraints */
+  /** Ref: wagmi.sh/react/prepare-hooks/intro#ios-app-link-constraints */
   /********************************************************************/
 
   // `fetchSigner` isn't really "asynchronous" as we have already
@@ -79,7 +76,7 @@ export async function sendTransaction({
     if (!request.to) throw new Error('`to` is required')
   }
 
-  if (chainId) assertActiveChain({ chainId })
+  if (chainId) assertActiveChain({ chainId, signer })
 
   try {
     // Why don't we just use `signer.sendTransaction`?
@@ -90,9 +87,9 @@ export async function sendTransaction({
     // when using it in a click handler (iOS deep linking issues,
     // delay to open wallet, etc).
 
-    const uncheckedSigner = (<providers.JsonRpcSigner>(
-      signer
-    )).connectUnchecked?.()
+    const uncheckedSigner = (
+      signer as providers.JsonRpcSigner
+    ).connectUnchecked?.()
     const { hash, wait } = await (uncheckedSigner ?? signer).sendTransaction(
       request,
     )
@@ -104,7 +101,10 @@ export async function sendTransaction({
 
     return { hash: hash as Hash, wait }
   } catch (error) {
-    if ((error as ProviderRpcError).code === 4001)
+    if (
+      (error as ProviderRpcError).code === 4001 ||
+      (error as EthersError).code === 'ACTION_REJECTED'
+    )
       throw new UserRejectedRequestError(error)
     throw error
   }

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { setupClient } from '../../../test'
 import { connect } from './connect'
-import { GetNetworkResult } from './getNetwork'
+import type { GetNetworkResult } from './getNetwork'
 import { switchNetwork } from './switchNetwork'
 import { watchNetwork } from './watchNetwork'
 
@@ -15,7 +15,7 @@ describe('watchNetwork', () => {
     const networks: GetNetworkResult[] = []
     const unwatch = watchNetwork((data) => networks.push(data))
 
-    await switchNetwork({ chainId: 4 })
+    await switchNetwork({ chainId: 5 })
     await switchNetwork({ chainId: 1 })
     unwatch()
 
@@ -26,33 +26,52 @@ describe('watchNetwork', () => {
             "blockExplorers": {
               "default": {
                 "name": "Etherscan",
-                "url": "https://rinkeby.etherscan.io",
+                "url": "https://goerli.etherscan.io",
               },
               "etherscan": {
                 "name": "Etherscan",
-                "url": "https://rinkeby.etherscan.io",
+                "url": "https://goerli.etherscan.io",
               },
             },
-            "ens": {
-              "address": "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e",
+            "contracts": {
+              "ensRegistry": {
+                "address": "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e",
+              },
+              "multicall3": {
+                "address": "0xca11bde05977b3631167028862be2a173976ca11",
+                "blockCreated": 6507670,
+              },
             },
-            "id": 4,
-            "multicall": {
-              "address": "0xca11bde05977b3631167028862be2a173976ca11",
-              "blockCreated": 10299530,
-            },
-            "name": "Rinkeby",
+            "id": 5,
+            "name": "Goerli",
             "nativeCurrency": {
               "decimals": 18,
-              "name": "Rinkeby Ether",
-              "symbol": "ETH",
+              "name": "Goerli Ether",
+              "symbol": "GOR",
             },
-            "network": "rinkeby",
+            "network": "goerli",
             "rpcUrls": {
-              "alchemy": "https://eth-rinkeby.alchemyapi.io/v2",
-              "default": "https://rpc.ankr.com/eth_rinkeby",
-              "infura": "https://rinkeby.infura.io/v3",
-              "public": "https://rpc.ankr.com/eth_rinkeby",
+              "alchemy": {
+                "http": [
+                  "https://eth-goerli.g.alchemy.com/v2",
+                ],
+                "webSocket": [
+                  "wss://eth-goerli.g.alchemy.com/v2",
+                ],
+              },
+              "default": {
+                "http": [
+                  "https://rpc.ankr.com/eth_goerli",
+                ],
+              },
+              "infura": {
+                "http": [
+                  "https://goerli.infura.io/v3",
+                ],
+                "webSocket": [
+                  "wss://goerli.infura.io/ws/v3",
+                ],
+              },
             },
             "testnet": true,
             "unsupported": false,
@@ -69,14 +88,16 @@ describe('watchNetwork', () => {
                   "url": "https://etherscan.io",
                 },
               },
-              "ens": {
-                "address": "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e",
+              "contracts": {
+                "ensRegistry": {
+                  "address": "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e",
+                },
+                "multicall3": {
+                  "address": "0xca11bde05977b3631167028862be2a173976ca11",
+                  "blockCreated": 14353601,
+                },
               },
               "id": 1,
-              "multicall": {
-                "address": "0xca11bde05977b3631167028862be2a173976ca11",
-                "blockCreated": 14353601,
-              },
               "name": "Ethereum",
               "nativeCurrency": {
                 "decimals": 18,
@@ -85,79 +106,28 @@ describe('watchNetwork', () => {
               },
               "network": "homestead",
               "rpcUrls": {
-                "alchemy": "https://eth-mainnet.alchemyapi.io/v2",
-                "default": "https://cloudflare-eth.com",
-                "infura": "https://mainnet.infura.io/v3",
-                "public": "https://cloudflare-eth.com",
-              },
-            },
-            {
-              "blockExplorers": {
+                "alchemy": {
+                  "http": [
+                    "https://eth-mainnet.g.alchemy.com/v2",
+                  ],
+                  "webSocket": [
+                    "wss://eth-mainnet.g.alchemy.com/v2",
+                  ],
+                },
                 "default": {
-                  "name": "Etherscan",
-                  "url": "https://ropsten.etherscan.io",
+                  "http": [
+                    "https://cloudflare-eth.com",
+                  ],
                 },
-                "etherscan": {
-                  "name": "Etherscan",
-                  "url": "https://ropsten.etherscan.io",
-                },
-              },
-              "ens": {
-                "address": "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e",
-              },
-              "id": 3,
-              "multicall": {
-                "address": "0xca11bde05977b3631167028862be2a173976ca11",
-                "blockCreated": 12063863,
-              },
-              "name": "Ropsten",
-              "nativeCurrency": {
-                "decimals": 18,
-                "name": "Ropsten Ether",
-                "symbol": "ETH",
-              },
-              "network": "ropsten",
-              "rpcUrls": {
-                "alchemy": "https://eth-ropsten.alchemyapi.io/v2",
-                "default": "https://rpc.ankr.com/eth_ropsten",
-                "infura": "https://ropsten.infura.io/v3",
-                "public": "https://rpc.ankr.com/eth_ropsten",
-              },
-              "testnet": true,
-            },
-            {
-              "blockExplorers": {
-                "default": {
-                  "name": "Etherscan",
-                  "url": "https://rinkeby.etherscan.io",
-                },
-                "etherscan": {
-                  "name": "Etherscan",
-                  "url": "https://rinkeby.etherscan.io",
+                "infura": {
+                  "http": [
+                    "https://mainnet.infura.io/v3",
+                  ],
+                  "webSocket": [
+                    "wss://mainnet.infura.io/ws/v3",
+                  ],
                 },
               },
-              "ens": {
-                "address": "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e",
-              },
-              "id": 4,
-              "multicall": {
-                "address": "0xca11bde05977b3631167028862be2a173976ca11",
-                "blockCreated": 10299530,
-              },
-              "name": "Rinkeby",
-              "nativeCurrency": {
-                "decimals": 18,
-                "name": "Rinkeby Ether",
-                "symbol": "ETH",
-              },
-              "network": "rinkeby",
-              "rpcUrls": {
-                "alchemy": "https://eth-rinkeby.alchemyapi.io/v2",
-                "default": "https://rpc.ankr.com/eth_rinkeby",
-                "infura": "https://rinkeby.infura.io/v3",
-                "public": "https://rpc.ankr.com/eth_rinkeby",
-              },
-              "testnet": true,
             },
             {
               "blockExplorers": {
@@ -170,57 +140,45 @@ describe('watchNetwork', () => {
                   "url": "https://goerli.etherscan.io",
                 },
               },
-              "ens": {
-                "address": "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e",
+              "contracts": {
+                "ensRegistry": {
+                  "address": "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e",
+                },
+                "multicall3": {
+                  "address": "0xca11bde05977b3631167028862be2a173976ca11",
+                  "blockCreated": 6507670,
+                },
               },
               "id": 5,
-              "multicall": {
-                "address": "0xca11bde05977b3631167028862be2a173976ca11",
-                "blockCreated": 6507670,
-              },
               "name": "Goerli",
               "nativeCurrency": {
                 "decimals": 18,
                 "name": "Goerli Ether",
-                "symbol": "ETH",
+                "symbol": "GOR",
               },
               "network": "goerli",
               "rpcUrls": {
-                "alchemy": "https://eth-goerli.alchemyapi.io/v2",
-                "default": "https://rpc.ankr.com/eth_goerli",
-                "infura": "https://goerli.infura.io/v3",
-                "public": "https://rpc.ankr.com/eth_goerli",
-              },
-              "testnet": true,
-            },
-            {
-              "blockExplorers": {
+                "alchemy": {
+                  "http": [
+                    "https://eth-goerli.g.alchemy.com/v2",
+                  ],
+                  "webSocket": [
+                    "wss://eth-goerli.g.alchemy.com/v2",
+                  ],
+                },
                 "default": {
-                  "name": "Etherscan",
-                  "url": "https://kovan.etherscan.io",
+                  "http": [
+                    "https://rpc.ankr.com/eth_goerli",
+                  ],
                 },
-                "etherscan": {
-                  "name": "Etherscan",
-                  "url": "https://kovan.etherscan.io",
+                "infura": {
+                  "http": [
+                    "https://goerli.infura.io/v3",
+                  ],
+                  "webSocket": [
+                    "wss://goerli.infura.io/ws/v3",
+                  ],
                 },
-              },
-              "id": 42,
-              "multicall": {
-                "address": "0xca11bde05977b3631167028862be2a173976ca11",
-                "blockCreated": 30285908,
-              },
-              "name": "Kovan",
-              "nativeCurrency": {
-                "decimals": 18,
-                "name": "Kovan Ether",
-                "symbol": "ETH",
-              },
-              "network": "kovan",
-              "rpcUrls": {
-                "alchemy": "https://eth-kovan.alchemyapi.io/v2",
-                "default": "https://kovan.infura.io/v3/84842078b09946638c03157f83405213",
-                "infura": "https://kovan.infura.io/v3",
-                "public": "https://kovan.infura.io/v3/84842078b09946638c03157f83405213",
               },
               "testnet": true,
             },
@@ -238,14 +196,16 @@ describe('watchNetwork', () => {
                 "url": "https://etherscan.io",
               },
             },
-            "ens": {
-              "address": "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e",
+            "contracts": {
+              "ensRegistry": {
+                "address": "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e",
+              },
+              "multicall3": {
+                "address": "0xca11bde05977b3631167028862be2a173976ca11",
+                "blockCreated": 14353601,
+              },
             },
             "id": 1,
-            "multicall": {
-              "address": "0xca11bde05977b3631167028862be2a173976ca11",
-              "blockCreated": 14353601,
-            },
             "name": "Ethereum",
             "nativeCurrency": {
               "decimals": 18,
@@ -254,7 +214,11 @@ describe('watchNetwork', () => {
             },
             "network": "homestead",
             "rpcUrls": {
-              "default": "http://127.0.0.1:8545",
+              "default": {
+                "http": [
+                  "http://127.0.0.1:8545",
+                ],
+              },
             },
             "unsupported": false,
           },
@@ -270,14 +234,16 @@ describe('watchNetwork', () => {
                   "url": "https://etherscan.io",
                 },
               },
-              "ens": {
-                "address": "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e",
+              "contracts": {
+                "ensRegistry": {
+                  "address": "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e",
+                },
+                "multicall3": {
+                  "address": "0xca11bde05977b3631167028862be2a173976ca11",
+                  "blockCreated": 14353601,
+                },
               },
               "id": 1,
-              "multicall": {
-                "address": "0xca11bde05977b3631167028862be2a173976ca11",
-                "blockCreated": 14353601,
-              },
               "name": "Ethereum",
               "nativeCurrency": {
                 "decimals": 18,
@@ -286,79 +252,28 @@ describe('watchNetwork', () => {
               },
               "network": "homestead",
               "rpcUrls": {
-                "alchemy": "https://eth-mainnet.alchemyapi.io/v2",
-                "default": "https://cloudflare-eth.com",
-                "infura": "https://mainnet.infura.io/v3",
-                "public": "https://cloudflare-eth.com",
-              },
-            },
-            {
-              "blockExplorers": {
+                "alchemy": {
+                  "http": [
+                    "https://eth-mainnet.g.alchemy.com/v2",
+                  ],
+                  "webSocket": [
+                    "wss://eth-mainnet.g.alchemy.com/v2",
+                  ],
+                },
                 "default": {
-                  "name": "Etherscan",
-                  "url": "https://ropsten.etherscan.io",
+                  "http": [
+                    "https://cloudflare-eth.com",
+                  ],
                 },
-                "etherscan": {
-                  "name": "Etherscan",
-                  "url": "https://ropsten.etherscan.io",
-                },
-              },
-              "ens": {
-                "address": "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e",
-              },
-              "id": 3,
-              "multicall": {
-                "address": "0xca11bde05977b3631167028862be2a173976ca11",
-                "blockCreated": 12063863,
-              },
-              "name": "Ropsten",
-              "nativeCurrency": {
-                "decimals": 18,
-                "name": "Ropsten Ether",
-                "symbol": "ETH",
-              },
-              "network": "ropsten",
-              "rpcUrls": {
-                "alchemy": "https://eth-ropsten.alchemyapi.io/v2",
-                "default": "https://rpc.ankr.com/eth_ropsten",
-                "infura": "https://ropsten.infura.io/v3",
-                "public": "https://rpc.ankr.com/eth_ropsten",
-              },
-              "testnet": true,
-            },
-            {
-              "blockExplorers": {
-                "default": {
-                  "name": "Etherscan",
-                  "url": "https://rinkeby.etherscan.io",
-                },
-                "etherscan": {
-                  "name": "Etherscan",
-                  "url": "https://rinkeby.etherscan.io",
+                "infura": {
+                  "http": [
+                    "https://mainnet.infura.io/v3",
+                  ],
+                  "webSocket": [
+                    "wss://mainnet.infura.io/ws/v3",
+                  ],
                 },
               },
-              "ens": {
-                "address": "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e",
-              },
-              "id": 4,
-              "multicall": {
-                "address": "0xca11bde05977b3631167028862be2a173976ca11",
-                "blockCreated": 10299530,
-              },
-              "name": "Rinkeby",
-              "nativeCurrency": {
-                "decimals": 18,
-                "name": "Rinkeby Ether",
-                "symbol": "ETH",
-              },
-              "network": "rinkeby",
-              "rpcUrls": {
-                "alchemy": "https://eth-rinkeby.alchemyapi.io/v2",
-                "default": "https://rpc.ankr.com/eth_rinkeby",
-                "infura": "https://rinkeby.infura.io/v3",
-                "public": "https://rpc.ankr.com/eth_rinkeby",
-              },
-              "testnet": true,
             },
             {
               "blockExplorers": {
@@ -371,57 +286,45 @@ describe('watchNetwork', () => {
                   "url": "https://goerli.etherscan.io",
                 },
               },
-              "ens": {
-                "address": "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e",
+              "contracts": {
+                "ensRegistry": {
+                  "address": "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e",
+                },
+                "multicall3": {
+                  "address": "0xca11bde05977b3631167028862be2a173976ca11",
+                  "blockCreated": 6507670,
+                },
               },
               "id": 5,
-              "multicall": {
-                "address": "0xca11bde05977b3631167028862be2a173976ca11",
-                "blockCreated": 6507670,
-              },
               "name": "Goerli",
               "nativeCurrency": {
                 "decimals": 18,
                 "name": "Goerli Ether",
-                "symbol": "ETH",
+                "symbol": "GOR",
               },
               "network": "goerli",
               "rpcUrls": {
-                "alchemy": "https://eth-goerli.alchemyapi.io/v2",
-                "default": "https://rpc.ankr.com/eth_goerli",
-                "infura": "https://goerli.infura.io/v3",
-                "public": "https://rpc.ankr.com/eth_goerli",
-              },
-              "testnet": true,
-            },
-            {
-              "blockExplorers": {
+                "alchemy": {
+                  "http": [
+                    "https://eth-goerli.g.alchemy.com/v2",
+                  ],
+                  "webSocket": [
+                    "wss://eth-goerli.g.alchemy.com/v2",
+                  ],
+                },
                 "default": {
-                  "name": "Etherscan",
-                  "url": "https://kovan.etherscan.io",
+                  "http": [
+                    "https://rpc.ankr.com/eth_goerli",
+                  ],
                 },
-                "etherscan": {
-                  "name": "Etherscan",
-                  "url": "https://kovan.etherscan.io",
+                "infura": {
+                  "http": [
+                    "https://goerli.infura.io/v3",
+                  ],
+                  "webSocket": [
+                    "wss://goerli.infura.io/ws/v3",
+                  ],
                 },
-              },
-              "id": 42,
-              "multicall": {
-                "address": "0xca11bde05977b3631167028862be2a173976ca11",
-                "blockCreated": 30285908,
-              },
-              "name": "Kovan",
-              "nativeCurrency": {
-                "decimals": 18,
-                "name": "Kovan Ether",
-                "symbol": "ETH",
-              },
-              "network": "kovan",
-              "rpcUrls": {
-                "alchemy": "https://eth-kovan.alchemyapi.io/v2",
-                "default": "https://kovan.infura.io/v3/84842078b09946638c03157f83405213",
-                "infura": "https://kovan.infura.io/v3",
-                "public": "https://kovan.infura.io/v3/84842078b09946638c03157f83405213",
               },
               "testnet": true,
             },

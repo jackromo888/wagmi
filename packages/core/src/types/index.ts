@@ -1,18 +1,14 @@
-import {
+import type {
   Address,
   ResolvedConfig,
   TypedData,
   TypedDataDomain,
   TypedDataToPrimitiveTypes,
 } from 'abitype'
-import { Signer as BaseSigner, BigNumber, providers } from 'ethers'
+import type { Signer as BaseSigner, BigNumber, providers } from 'ethers'
 
-import {
-  BlockExplorer,
-  BlockExplorerName,
-  RpcProviderName,
-  units,
-} from '../constants'
+import type { Chain } from '../chains'
+import type { units } from '../constants'
 
 declare module 'abitype' {
   export interface Config {
@@ -22,7 +18,7 @@ declare module 'abitype' {
   }
 }
 
-declare module 'ethers/lib/utils' {
+declare module 'ethers/lib/utils.js' {
   export function getAddress(address: string): Address
   export function isAddress(address: string): address is Address
   export function verifyTypedData<
@@ -50,42 +46,6 @@ declare module 'ethers/lib/utils' {
 }
 
 export type Hash = `0x${string}`
-
-export type Chain = {
-  /** ID in number form */
-  id: number
-  /** Human-readable name */
-  name: string
-  /** Internal network name */
-  network: string
-  /** Currency used by chain */
-  nativeCurrency?: AddEthereumChainParameter['nativeCurrency']
-  /** Collection of RPC endpoints */
-  rpcUrls: { [key in RpcProviderName]?: string } & {
-    [key: string]: string
-    default: string
-  }
-  /** Collection of block explorers */
-  blockExplorers?: {
-    [key in BlockExplorerName]?: BlockExplorer
-  } & {
-    [key: string]: BlockExplorer
-    default: BlockExplorer
-  }
-  /** ENS registry */
-  ens?: {
-    address: Address
-  }
-  /**
-   * Chain [multicall3 contract](https://github.com/mds1/multicall)
-   */
-  multicall?: {
-    address: Address
-    blockCreated: number
-  }
-  /** Flag for test networks */
-  testnet?: boolean
-}
 
 export type ChainProviderFn<
   TProvider extends Provider = providers.BaseProvider,
@@ -158,22 +118,25 @@ type WatchAssetParams = {
 }
 
 type InjectedProviderFlags = {
+  isAvalanche?: true
   isBitKeep?: true
   isBraveWallet?: true
   isCoinbaseWallet?: true
   isExodus?: true
   isFrame?: true
+  isKuCoinWallet?: true
   isMathWallet?: true
   isMetaMask?: true
   isOneInchAndroidWallet?: true
   isOneInchIOSWallet?: true
   isOpera?: true
+  isPhantom?: true
   isPortal?: true
   isTally?: true
   isTokenPocket?: true
   isTokenary?: true
   isTrust?: true
-  isAvalanche?: true
+  isTrustWallet?: true
 }
 
 type InjectedProviders = InjectedProviderFlags & {

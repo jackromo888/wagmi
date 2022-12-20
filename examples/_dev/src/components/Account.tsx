@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useAccount, useDisconnect, useEnsAvatar, useEnsName } from 'wagmi'
 
 import { useIsMounted } from '../hooks'
@@ -10,6 +9,7 @@ import { ReadContractsInfinite } from './ReadContractsInfinite'
 import { SendTransaction } from './SendTransaction'
 import { SendTransactionPrepared } from './SendTransactionPrepared'
 import { SignMessage } from './SignMessage'
+import { SignTypedData } from './SignTypedData'
 import { Token } from './Token'
 import { WriteContract } from './WriteContract'
 import { WriteContractPrepared } from './WriteContractPrepared'
@@ -21,7 +21,7 @@ export const Account = () => {
     onDisconnect: () => console.log('disconnected'),
   })
   const ensAvatar = useEnsAvatar({
-    addressOrName: account?.address,
+    address: account?.address,
     chainId: 1,
   })
   const ensName = useEnsName({ address: account?.address, chainId: 1 })
@@ -84,6 +84,9 @@ export const Account = () => {
             <>
               <h4>Sign Message</h4>
               <SignMessage />
+
+              <h4>Sign Typed Data</h4>
+              <SignTypedData />
 
               <h4>Token</h4>
               <Token />

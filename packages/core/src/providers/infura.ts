@@ -1,30 +1,29 @@
 import { providers } from 'ethers'
 
-import { defaultInfuraApiKey } from '../constants/rpcs'
-import { ChainProviderFn, FallbackProviderConfig } from '../types'
+import type { ChainProviderFn, FallbackProviderConfig } from '../types'
 
 export type InfuraProviderConfig = FallbackProviderConfig & {
-  // TODO: Make `apiKey` required in next minor version (v0.8).
-  apiKey?: string
+  /** Your Infura API key from the [Infura Dashboard](https://infura.io/login). */
+  apiKey: string
 }
 
 export function infuraProvider({
-  apiKey = defaultInfuraApiKey,
+  apiKey,
   priority,
   stallTimeout,
   weight,
-}: InfuraProviderConfig = {}): ChainProviderFn<
+}: InfuraProviderConfig): ChainProviderFn<
   providers.InfuraProvider,
   providers.InfuraWebSocketProvider
 > {
   return function (chain) {
-    if (!chain.rpcUrls.infura) return null
+    if (!chain.rpcUrls.infura?.http[0]) return null
     return {
       chain: {
         ...chain,
         rpcUrls: {
           ...chain.rpcUrls,
-          default: `${chain.rpcUrls.infura}/${apiKey}`,
+          default: { http: [`${chain.rpcUrls.infura?.http[0]}/${apiKey}`] },
         },
       },
       provider: () => {

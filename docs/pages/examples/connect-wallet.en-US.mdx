@@ -3,32 +3,31 @@ title: 'Connect Wallet Example'
 description: 'Learn how to connect wallets, like MetaMask, WalletConnect, and Coinbase Wallet, with wagmi.'
 ---
 
-import Callout from 'nextra-theme-docs/callout'
+import { Callout } from 'nextra-theme-docs'
 import { ConnectWallet } from '../../components/examples'
 
 # Connect Wallet
 
 Connecting wallets to your app is extremely simple when you use wagmi. It takes less than five minutes to get up and running with MetaMask, WalletConnect, and Coinbase Wallet!
 
-The example below uses [`useConnect`](/docs/hooks/useConnect), [`useAccount`](/docs/hooks/useAccount), and [`useDisconnect`](/docs/hooks/useDisconnect) to allow you to connect a wallet and view ENS information for the connected account. Try it out before moving on.
+The example below uses [`useConnect`](/react/hooks/useConnect), [`useAccount`](/react/hooks/useAccount), and [`useDisconnect`](/react/hooks/useDisconnect) to allow you to connect a wallet and view ENS information for the connected account. Try it out before moving on.
 
 <ConnectWallet />
 
-<Callout emoji="🚀">
-  Check out [ConnectKit](https://docs.family.co/connectkit?utm_source=wagmi-dev) to get started with pre-built interface on top of wagmi for managing wallet connections.
+<Callout type="info">
+  Check out [ConnectKit](https://docs.family.co/connectkit?utm_source=wagmi-dev)
+  or [Web3Modal](https://web3modal.com/) to get started with pre-built interface
+  on top of wagmi for managing wallet connections.
 </Callout>
 
 ## Step 1: Configuring Connectors
 
-First, we create a new wagmi client set up with the Injected (i.e. MetaMask), WalletConnect, and Coinbase Wallet connectors:
+First, we create a new wagmi client set up with the Injected (i.e. MetaMask), WalletConnect, and Coinbase Wallet connectors.
+
+This example uses the Ethereum Mainnet chain (`mainnet`) from `wagmi`, however, you can also pass in any [EVM-compatible chain](/react/chains).
 
 ```tsx
-import {
-  WagmiConfig,
-  createClient,
-  defaultChains,
-  configureChains,
-} from 'wagmi'
+import { WagmiConfig, createClient, configureChains, mainnet } from 'wagmi'
 
 import { alchemyProvider } from 'wagmi/providers/alchemy'
 import { publicProvider } from 'wagmi/providers/public'
@@ -40,10 +39,10 @@ import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
 
 // Configure chains & providers with the Alchemy provider.
 // Two popular providers are Alchemy (alchemy.com) and Infura (infura.io)
-const { chains, provider, webSocketProvider } = configureChains(defaultChains, [
-  alchemyProvider({ apiKey: 'yourAlchemyApiKey' }),
-  publicProvider(),
-])
+const { chains, provider, webSocketProvider } = configureChains(
+  [mainnet],
+  [alchemyProvider({ apiKey: 'yourAlchemyApiKey' }), publicProvider()],
+)
 
 // Set up client
 const client = createClient({
@@ -132,7 +131,7 @@ import {
 
 export function Profile() {
   const { address, connector, isConnected } = useAccount()
-  const { data: ensAvatar } = useEnsAvatar({ addressOrName: address })
+  const { data: ensAvatar } = useEnsAvatar({ address })
   const { data: ensName } = useEnsName({ address })
   const { connect, connectors, error, isLoading, pendingConnector } =
     useConnect()

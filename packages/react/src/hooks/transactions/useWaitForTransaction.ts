@@ -1,41 +1,57 @@
-import {
+import type {
   WaitForTransactionArgs,
   WaitForTransactionResult,
-  waitForTransaction,
 } from '@wagmi/core'
+import { waitForTransaction } from '@wagmi/core'
 
-import { QueryConfig, QueryFunctionArgs } from '../../types'
+import type { QueryConfig, QueryFunctionArgs } from '../../types'
 import { useChainId, useQuery } from '../utils'
 
 export type UseWaitForTransactionArgs = Partial<WaitForTransactionArgs>
-
 export type UseWaitForTransactionConfig = QueryConfig<
   WaitForTransactionResult,
   Error
 >
 
-export const queryKey = ({
+type QueryKeyArgs = Partial<UseWaitForTransactionArgs>
+type QueryKeyConfig = Pick<UseWaitForTransactionConfig, 'scopeKey'>
+
+function queryKey({
   confirmations,
   chainId,
   hash,
+  scopeKey,
   timeout,
-  wait,
-}: Partial<WaitForTransactionArgs>) =>
-  [
+}: QueryKeyArgs & QueryKeyConfig) {
+  return [
     {
       entity: 'waitForTransaction',
       confirmations,
       chainId,
       hash,
+      scopeKey,
       timeout,
-      wait,
     },
   ] as const
+}
 
-const queryFn = ({
-  queryKey: [{ chainId, confirmations, hash, timeout, wait }],
-}: QueryFunctionArgs<typeof queryKey>) => {
-  return waitForTransaction({ chainId, confirmations, hash, timeout, wait })
+function queryFn({
+  onSpeedUp,
+}: {
+  onSpeedUp?: WaitForTransactionArgs['onSpeedUp']
+}) {
+  return ({
+    queryKey: [{ chainId, confirmations, hash, timeout }],
+  }: QueryFunctionArgs<typeof queryKey>) => {
+    if (!hash) throw new Error('hash is required')
+    return waitForTransaction({
+      chainId,
+      confirmations,
+      hash,
+      onSpeedUp,
+      timeout,
+    })
+  }
 }
 
 export function useWaitForTransaction({
@@ -43,23 +59,24 @@ export function useWaitForTransaction({
   confirmations,
   hash,
   timeout,
-  wait,
   cacheTime,
   enabled = true,
+  scopeKey,
   staleTime,
   suspense,
   onError,
+  onSpeedUp,
   onSettled,
   onSuccess,
 }: UseWaitForTransactionArgs & UseWaitForTransactionConfig = {}) {
   const chainId = useChainId({ chainId: chainId_ })
 
   return useQuery(
-    queryKey({ chainId, confirmations, hash, timeout, wait }),
-    queryFn,
+    queryKey({ chainId, confirmations, hash, scopeKey, timeout }),
+    queryFn({ onSpeedUp }),
     {
       cacheTime,
-      enabled: Boolean(enabled && (hash || wait)),
+      enabled: Boolean(enabled && hash),
       staleTime,
       suspense,
       onError,

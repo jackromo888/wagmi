@@ -1,7 +1,8 @@
-import { Client, getClient } from '../../client'
-import { Connector, ConnectorData } from '../../connectors'
+import type { Client } from '../../client'
+import { getClient } from '../../client'
+import type { Connector, ConnectorData } from '../../connectors'
 import { ConnectorAlreadyConnectedError } from '../../errors'
-import { Provider } from '../../types'
+import type { Provider } from '../../types'
 
 export type ConnectArgs = {
   /** Chain ID to connect to */
@@ -27,7 +28,7 @@ export async function connect<TProvider extends Provider = Provider>({
 }: ConnectArgs): Promise<ConnectResult<TProvider>> {
   const client = getClient()
   const activeConnector = client.connector
-  if (connector.id === activeConnector?.id)
+  if (activeConnector && connector.id === activeConnector.id)
     throw new ConnectorAlreadyConnectedError()
 
   try {
