@@ -1,19 +1,31 @@
 {
   "compilerOptions": {
     "allowJs": true,
+    "baseUrl": ".",
     "downlevelIteration": true,
     "esModuleInterop": true,
-    "incremental": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
-    "lib": ["es2019", "es2017", "dom"],
-    "module": "commonjs",
+    "lib": ["es2021", "dom"],
+    "module": "esnext",
     "moduleResolution": "node",
     "noEmit": true,
     "noImplicitAny": true,
     "noUncheckedIndexedAccess": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    "paths": {
+      "@wagmi/chains": ["references/packages/chains/src"],
+      "@wagmi/connectors": ["references/packages/connectors/src"],
+      "@wagmi/connectors/*": ["references/packages/connectors/src/*"],
+      "@wagmi/core": ["packages/core/src"],
+      "@wagmi/core/*": ["packages/core/src/*"],
+      "wagmi": ["packages/react/src"],
+      "wagmi/*": ["packages/react/src/*"],
+      // TODO: Remove once issue is fixed
+      // https://github.com/microsoft/TypeScript/issues/48212
+      "abitype": ["packages/core/node_modules/abitype/dist"]
+    },
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true,
@@ -26,6 +38,11 @@
       "@ethersproject/providers"
     ]
   },
-  "exclude": ["node_modules", "**/dist/**"],
-  "include": ["packages/**/*"]
+  "exclude": ["**/node_modules/**", "**/dist/**"],
+  "include": [
+    "examples/**/*",
+    "packages/**/*",
+    "scripts/**/*",
+    "vitest.config.ts"
+  ]
 }
